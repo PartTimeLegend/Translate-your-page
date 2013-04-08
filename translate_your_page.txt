@@ -1,0 +1,179 @@
+###############################################
+##   Hack Title:   Translate your page
+##   Hack Version:   0.0.7
+##   Author:      Antony Bailey & Freakin' Booty ;-P
+##   Description:   Adds the option to translate a topic on your phpBB.
+##   Compatibility:   2.0.0 - 2.0.5
+##
+##   Installation Level: Easy
+##   Installation Time: 5 minutes
+##   Files To Edit: 3
+##      templates/subSilver/viewtopic_body.tpl
+##      language/lang_english/lang_main.php
+##      viewtopic.php
+##
+##
+##   History:
+##      0.0.1:    Code started
+##      0.0.2:    Alpha test. And Freakin' Booty ;-P joined.
+##      0.0.3:    Lang variables added.
+##      0.0.4:    Lang variables fixed, and actually made to work.
+##		0.0.5:    The site url is now made dynamic, reducing the hassle installing this hack.
+##      0.0.6:    Typos fixed, and Portuguese added to template.
+##		0.0.7:    The session id is now sent at all times, ensuring you are logged in.
+##
+##   Author Notes:
+##      Freakin' Booty ;-P loves tabs!
+##		If only Antony loved them as well :roll:
+##
+##   Support:      http://www.phpbbhacks.com/forums
+##   Copyright:      ©2003 Translate your page 0.0.7 - Antony Bailey & Freakin' Booty ;-P
+##
+###############################################
+##   You downloaded this hack from phpBBHacks.com, the #1 source for phpBB related downloads.
+##   Please visit http://www.phpbbhacks.com/forums for support.
+###############################################
+##
+###############################################
+##   This hack is released under the GPL License.
+##   This hack can be freely used, but not distributed, without permission.
+##   Intellectual Property is retained by the hack author(s) listed above.
+###############################################
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+# Make sure to edit this file for every template installed (syntax may vary!)
+#
+templates/subSilver/viewtopic_body.tpl
+
+#
+#-----[ FIND ]------------------------------------------
+#
+<table width="100%" cellspacing="2" border="0" align="center">
+  <tr>
+   <td width="40%" valign="top" nowrap="nowrap" align="left"><span class="gensmall">{S_WATCH_TOPIC}</span><br />
+
+#
+#-----[ AFTER, ADD ]------------------------------------
+#
+     <span class="gensmall">
+     <form action="http://translate.google.com/translate" method="get" name="translate" target="_translate">
+      <input type="hidden" name="u" value="{SITE_URL}" />
+      <input type="hidden" name="ie" value="{S_CONTENT_ENCODING}" />
+      Translation: <select name="langpair" onchange="if (this.options[this.selectedIndex].value != -1) { document.translate.submit(); }">
+        <option value="-1" selected="selected">{L_Translate_Topic}</option>
+        <option value="en|de">{L_English_to_German}</option>
+        <option value="en|es">{L_English_to_Spanish}</option>
+        <option value="en|fr">{L_English_to_French}</option>
+        <option value="en|it">{L_English_to_Italian}</option>
+        <option value="en|pt">{L_English_to_Portuguese}</option>
+        <option value="de|en">{L_German_to_English}</option>
+        <option value="de|fr">{L_German_to_French}</option>
+        <option value="es|en">{L_Spanish_to_English}</option>
+        <option value="fr|en">{L_French_to_English}</option>
+        <option value="fr|de">{L_French_to_German}</option>
+        <option value="it|en">{L_Italian_to_English}</option>
+        <option value="pt|en">{L_Portuguese_to_English}</option>
+      </select>
+      &nbsp;<input type="submit" value="{L_GO}" />
+     </form></span><br />
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+# Make sure to edit this file for every language installed
+#
+language/lang_english/lang_main.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+?>
+
+#
+#-----[ BEFORE, ADD ]------------------------------------
+#
+//
+// Translate a topic
+//
+$lang['Translate_Topic'] = "Translate topic to...";
+$lang['English_to_German'] = "English to German";
+$lang['English_to_Spanish'] = "English to Spanish";
+$lang['English_to_French'] = "English to French";
+$lang['English_to_Italian'] = "English to Italian";
+$lang['English_to_Portuguese'] = "English to Portuguese";
+$lang['German_to_English'] = "German to English";
+$lang['German_to_French'] = "German to French";
+$lang['Spanish_to_English'] = "Spanish to English";
+$lang['French_to_English'] = "French to English";
+$lang['French_to_German'] = "French to German";
+$lang['Italian_to_English'] = "Italian to English";
+$lang['Portuguese_to_English'] = "Portuguese to English";
+
+#
+#-----[ OPEN ]------------------------------------------
+#
+viewtopic.php
+
+#
+#-----[ FIND ]------------------------------------------
+#
+$pagination = ( $highlight_active ) ? generate_pagination("viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;postdays=$post_days&amp;postorder=$post_order&amp;highlight=$highlight", $total_replies, $board_config['posts_per_page'], $start) : generate_pagination("viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;postdays=$post_days&amp;postorder=$post_order", $total_replies, $board_config['posts_per_page'], $start);
+
+#
+#-----[ AFTER, ADD ]------------------------------------
+#
+//
+// Get the full url to this topic
+//
+$server_protocol = ($board_config['cookie_secure']) ? 'https://' : 'http://';
+$server_name = preg_replace('#^\/?(.*?)\/?$#', '\1', trim($board_config['server_name']));
+$server_port = ($board_config['server_port'] <> 80) ? ':' . trim($board_config['server_port']) : '';
+$script_name = preg_replace('#^\/?(.*?)\/?$#', '\1', trim($board_config['script_path']));
+$script_name = ($script_name == '') ? $script_name : '/' . $script_name;
+$url = preg_replace('#^\/?(.*?)\/?$#', '/\1', trim("viewtopic.$phpEx?" . POST_TOPIC_URL . "=$topic_id&amp;start=$start"));
+if(!preg_match('#sid=#', $url))
+{
+	$url .= ((strpos($url, '?') != false) ? '&amp;' : '?') . 'sid=' . $userdata['session_id'];
+}
+
+$site_url = $server_protocol . $server_name . $server_port . $script_name . $url;
+
+#
+#-----[ FIND ]------------------------------------------
+#
+	'PAGE_NUMBER' => sprintf($lang['Page_of'], ( floor( $start / intval($board_config['posts_per_page']) ) + 1 ), ceil( $total_replies / intval($board_config['posts_per_page']) )),
+
+#
+#-----[ AFTER, ADD ]------------------------------------
+#
+	'SITE_URL' => $site_url,
+
+#
+#-----[ FIND ]------------------------------------------
+#
+	'L_MESSAGE' => $lang['Message'],
+
+#
+#-----[ AFTER, ADD ]------------------------------------
+#
+	'L_Translate_Topic' => $lang['Translate_Topic'],
+	'L_English_to_German' => $lang['English_to_German'],
+	'L_English_to_Spanish' => $lang['English_to_Spanish'],
+	'L_English_to_French' => $lang['English_to_French'],
+	'L_English_to_Italian' => $lang['English_to_Italian'],
+	'L_English_to_Portuguese' => $lang['English_to_Portuguese'],
+	'L_German_to_English' => $lang['German_to_English'],
+	'L_German_to_French' => $lang['German_to_French'],
+	'L_Spanish_to_English' => $lang['Spanish_to_English'],
+	'L_French_to_English' => $lang['French_to_English'],
+	'L_French_to_German' => $lang['French_to_German'],
+	'L_Italian_to_English' => $lang['Italian_to_English'],
+	'L_Portuguese_to_English' => $lang['Portuguese_to_English'],
+
+#
+#-----[ SAVE & CLOSE ALL FILES ]--------------------------
+#
+#End
+
